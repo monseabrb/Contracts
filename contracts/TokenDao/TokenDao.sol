@@ -2,7 +2,6 @@
 pragma solidity ^0.8.9;
 
 import "@openzeppelin/contracts@4.8.2/token/ERC20/ERC20.sol";
-import "@openzeppelin/contracts@4.8.2/token/ERC20/extensions/ERC20Burnable.sol";
 import "@openzeppelin/contracts@4.8.2/security/Pausable.sol";
 import "@openzeppelin/contracts@4.8.2/access/Ownable.sol";
 import "@openzeppelin/contracts@4.8.2/token/ERC20/extensions/draft-ERC20Permit.sol";
@@ -10,7 +9,7 @@ import "@openzeppelin/contracts@4.8.2/token/ERC20/extensions/ERC20Votes.sol";
 import "./TokenRescuer.sol";
 
 /// @custom:security-contact security@tkn.xyz
-contract TokenDao is ERC20, ERC20Burnable, Pausable, Ownable, ERC20Permit, ERC20Votes, TokenRescuer {
+contract TokenDao is ERC20, Pausable, Ownable, ERC20Permit, ERC20Votes, TokenRescuer {
     constructor(address owner) ERC20("TokenDao", "TKN") ERC20Permit("TokenDao") {
         // Transfer ownership immediately
         _transferOwnership(owner);
