@@ -3,6 +3,7 @@ pragma solidity ^0.8.17;
 
 import "./Interfaces.sol";
 
+// Consider adding ENS reverse resolution for this contract address: https://github.com/ensdomains/ens-contracts/blob/master/contracts/reverseRegistrar/ReverseClaimer.sol
 contract TNS {
     ENSRegistryWithFallback ens;
 
