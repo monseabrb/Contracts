@@ -32,11 +32,13 @@ contract Wise is Ownable {
     }
 
     function approveSubmission(uint256 submissionIndex) public onlyOwner {
+        require(submissionIndex < submissions.length, "Invalid submission index");
         submissions[submissionIndex].status = Status.ACCEPTED;
         emit StatusChanged(submissionIndex, Status.ACCEPTED);
     }
 
     function rejectSubmission(uint256 submissionIndex) public onlyOwner {
+        require(submissionIndex < submissions.length, "Invalid submission index");
         submissions[submissionIndex].status = Status.REJECTED;
         emit StatusChanged(submissionIndex, Status.REJECTED);
 
@@ -47,6 +49,7 @@ contract Wise is Ownable {
     }
 
     function mergeSubmissionAndPayout(uint256 submissionIndex, uint256 reward) public payable onlyOwner {
+        require(submissionIndex < submissions.length, "Invalid submission index");
         submissions[submissionIndex].status = Status.MERGED;
         emit StatusChanged(submissionIndex, Status.MERGED);
 
@@ -57,43 +60,37 @@ contract Wise is Ownable {
     }
 
     // View Functions
-    function getSubmissionsAtPage(uint256 page) public view returns (Submission[] memory) {
+    function getSubmissionsAtPage(uint256 page) external view returns (Submission[] memory) {
         uint pageLength = 10;
         uint paginationIndex = page * pageLength;
-        uint submissionLength = submissions.length;
-        uint remainingIndex = submissionLength - paginationIndex;
-        uint arrAlloc = pageLength;
-        if (remainingIndex < pageLength) {
-            arrAlloc = remainingIndex;
-        }
-        Submission[] memory id = new Submission[](arrAlloc);
+        uint arrAlloc = Math.min(pageLength, submissions.length - paginationIndex);
 
-        uint index = 0;
-        for (uint i = paginationIndex; i < paginationIndex + arrAlloc; i++) {
-            Submission storage submission = submissions[i];
-            id[index] = submission;
-            index = index + 1;
+        Submission[] memory result = new Submission[](arrAlloc);
+
+        for (uint i = 0; i < arrAlloc; i++) {
+            result[i] = submissions[paginationIndex + i];
         }
-        return id;
+
+        return result;
     }
 
-    function getDescSubmissionsAtPage(uint256 page) public view returns (Submission[] memory) {
+    function getDescSubmissionsAtPage(uint256 page) external view returns (Submission[] memory) {
         uint pageLength = 5;
-        uint submissionLength = submissions.length;
-        uint paginationIndex = submissionLength - (pageLength * (page + 1));
-        Submission[] memory id = new Submission[](pageLength);
+        uint paginationIndex = submissions.length - (pageLength * (page + 1));
+        uint arrAlloc = Math.min(pageLength, submissions.length - paginationIndex);
 
+        Submission[] memory result = new Submission[](arrAlloc);
         uint index = 0;
-        for (uint i = paginationIndex; i < paginationIndex + pageLength; i++) {
-            Submission storage submission = submissions[i];
+
+        for (uint i = 0; i < arrAlloc; i++) {
+            Submission storage submission = submissions[paginationIndex + i];
             if (submission.status != Status.SPAM) {
-                id[index] = submission;
-                index = index + 1;
+                result[index++] = submission;
             }
         }
-        return id;
+        return result;
     }
-
+    
     function withdraw() public onlyOwner {
         payable(msg.sender).transfer(address(this).balance);
     }
@@ -105,6 +102,7 @@ contract Wise is Ownable {
     }
 
     function markSubmissionAsSpam(uint256 submissionIndex) public onlyOwner {
+        require(submissionIndex < submissions.length, "Invalid submission index");
         submissions[submissionIndex].status = Status.SPAM;
         emit StatusChanged(submissionIndex, Status.SPAM);
     }
@@ -115,6 +113,7 @@ contract Wise is Ownable {
 
     // TESTS
     function getSubmissionAtIndex(uint256 submissionIndex) public view returns(Submission memory) {
+        require(submissionIndex < submissions.length, "Invalid submission index");
         return submissions[submissionIndex];
     }
 }

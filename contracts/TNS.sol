@@ -12,19 +12,18 @@ contract TNS {
         // The ens registry address is shared across testnets and mainnet
     }
 
+    // Helper function to get resolver address and namehash for a given token name
+    function getAddressAndNamehash(string calldata _name) public view returns (address, bytes32) {
+        bytes32 namehash = keccak256(abi.encodePacked(bytes32(0), keccak256(abi.encodePacked('eth'))));
+        namehash = keccak256(abi.encodePacked(namehash, keccak256(abi.encodePacked('tkn'))));
+        namehash = keccak256(abi.encodePacked(namehash, keccak256(abi.encodePacked(_name))));
+        address resolverAddr = ens.resolver(namehash);
+        return (resolverAddr, namehash);
+    }
+
     // Enter 'uni' to lookup uni.tkn.eth
     function addressFor(string calldata _name) public view returns (address) {
-        bytes32 namehash = 0x0000000000000000000000000000000000000000000000000000000000000000;
-        namehash = keccak256(
-            abi.encodePacked(namehash, keccak256(abi.encodePacked('eth')))
-        );
-        namehash = keccak256(
-            abi.encodePacked(namehash, keccak256(abi.encodePacked('tkn')))
-        );
-        namehash = keccak256(
-            abi.encodePacked(namehash, keccak256(abi.encodePacked(_name)))
-        );
-        address resolverAddr = ens.resolver(namehash);
+        (address resolverAddr, bytes32 namehash) = getAddressAndNamehash(_name);
         PublicResolver resolver = PublicResolver(resolverAddr);
         return resolver.addr(namehash);
     }
@@ -90,18 +89,9 @@ contract TNS {
         address payable sepolia_address; 
     }
 
+    // Function to get metadata ( token info and addresses) for a given token name
     function dataFor(string calldata _name) public view returns (Metadata memory) {
-        bytes32 namehash = 0x0000000000000000000000000000000000000000000000000000000000000000;
-        namehash = keccak256(
-            abi.encodePacked(namehash, keccak256(abi.encodePacked('eth')))
-        );
-        namehash = keccak256(
-            abi.encodePacked(namehash, keccak256(abi.encodePacked('tkn')))
-        );
-        namehash = keccak256(
-            abi.encodePacked(namehash, keccak256(abi.encodePacked(_name)))
-        );
-        address resolverAddr = ens.resolver(namehash);
+        (address resolverAddr, bytes32 namehash) = getAddressAndNamehash(_name);
         PublicResolver resolver = PublicResolver(resolverAddr);
 
         return Metadata(
@@ -134,18 +124,9 @@ contract TNS {
         );
     }
 
+    // Function to get token info for a given token name
     function infoFor(string calldata _name) public view returns (TokenInfo memory) {
-        bytes32 namehash = 0x0000000000000000000000000000000000000000000000000000000000000000;
-        namehash = keccak256(
-            abi.encodePacked(namehash, keccak256(abi.encodePacked('eth')))
-        );
-        namehash = keccak256(
-            abi.encodePacked(namehash, keccak256(abi.encodePacked('tkn')))
-        );
-        namehash = keccak256(
-            abi.encodePacked(namehash, keccak256(abi.encodePacked(_name)))
-        );
-        address resolverAddr = ens.resolver(namehash);
+        (address resolverAddr, bytes32 namehash) = getAddressAndNamehash(_name);
         PublicResolver resolver = PublicResolver(resolverAddr);
 
         return TokenInfo(
@@ -163,18 +144,9 @@ contract TNS {
         );
     }
 
+    // Function to get token addresses for a given token name
     function addressesFor(string calldata _name) public view returns (TokenAddresses memory) {
-        bytes32 namehash = 0x0000000000000000000000000000000000000000000000000000000000000000;
-        namehash = keccak256(
-            abi.encodePacked(namehash, keccak256(abi.encodePacked('eth')))
-        );
-        namehash = keccak256(
-            abi.encodePacked(namehash, keccak256(abi.encodePacked('tkn')))
-        );
-        namehash = keccak256(
-            abi.encodePacked(namehash, keccak256(abi.encodePacked(_name)))
-        );
-        address resolverAddr = ens.resolver(namehash);
+        (address resolverAddr, bytes32 namehash) = getAddressAndNamehash(_name);
         PublicResolver resolver = PublicResolver(resolverAddr);
 
         return TokenAddresses(
@@ -198,17 +170,7 @@ contract TNS {
 
     // Get chain ID here: https://github.com/ensdomains/address-encoder
     function getContractForChain(uint256 _chainId, string calldata _name) public view returns (bytes memory) {
-        bytes32 namehash = 0x0000000000000000000000000000000000000000000000000000000000000000;
-        namehash = keccak256(
-            abi.encodePacked(namehash, keccak256(abi.encodePacked('eth')))
-        );
-        namehash = keccak256(
-            abi.encodePacked(namehash, keccak256(abi.encodePacked('tkn')))
-        );
-        namehash = keccak256(
-            abi.encodePacked(namehash, keccak256(abi.encodePacked(_name)))
-        );
-        address resolverAddr = ens.resolver(namehash);
+        (address resolverAddr, bytes32 namehash) = getAddressAndNamehash(_name);
         PublicResolver resolver = PublicResolver(resolverAddr);
         return resolver.addr(namehash, _chainId);
     }
